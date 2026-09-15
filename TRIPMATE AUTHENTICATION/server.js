@@ -10,7 +10,11 @@ import mongoose from "mongoose";
 
 const app = express();
 const port = Number(process.env.PORT || 4000);
-const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+const clientOrigin = (
+  process.env.FRONTEND_URL ||
+  process.env.CLIENT_ORIGIN ||
+  "http://localhost:5173"
+).replace(/\/$/, "");
 const isProduction = process.env.NODE_ENV === "production";
 
 if (!process.env.MONGODB_URI || !process.env.JWT_SECRET) {
@@ -108,19 +112,15 @@ app.post("/api/auth/register", async (request, response) => {
         .status(400)
         .json({ success: false, error: "Enter a valid email address." });
     if (password.length < 8)
-      return response
-        .status(400)
-        .json({
-          success: false,
-          error: "Password must be at least 8 characters.",
-        });
+      return response.status(400).json({
+        success: false,
+        error: "Password must be at least 8 characters.",
+      });
     if (await User.exists({ email }))
-      return response
-        .status(409)
-        .json({
-          success: false,
-          error: "An account with that email already exists.",
-        });
+      return response.status(409).json({
+        success: false,
+        error: "An account with that email already exists.",
+      });
 
     const user = await User.create({
       name,
@@ -131,12 +131,10 @@ app.post("/api/auth/register", async (request, response) => {
     return response.status(201).json({ success: true, user: publicUser(user) });
   } catch (error) {
     if (error?.code === 11000)
-      return response
-        .status(409)
-        .json({
-          success: false,
-          error: "An account with that email already exists.",
-        });
+      return response.status(409).json({
+        success: false,
+        error: "An account with that email already exists.",
+      });
     console.error(error);
     return response
       .status(500)

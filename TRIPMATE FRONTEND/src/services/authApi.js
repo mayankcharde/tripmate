@@ -1,5 +1,6 @@
-const AUTH_API_BASE =
-  import.meta.env.VITE_AUTH_API_URL || "http://localhost:4000";
+const AUTH_API_BASE = (
+  import.meta.env.VITE_AUTH_API_URL || "http://localhost:4000"
+).replace(/\/+$/, "");
 
 async function request(path, options = {}) {
   const response = await fetch(`${AUTH_API_BASE}${path}`, {

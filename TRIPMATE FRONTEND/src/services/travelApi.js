@@ -1,7 +1,10 @@
-const API_BASE = import.meta.env.VITE_API_URL || "";
+const API_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
 async function request(path, options) {
-  const response = await fetch(`${API_BASE}${path}`, options);
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    credentials: "include",
+  });
   const data = await response.json();
 
   if (!response.ok || !data.success) {

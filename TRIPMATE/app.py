@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import traceback
 
@@ -19,6 +20,8 @@ nest_asyncio.apply()
 
 BASE_DIR = Path(__file__).resolve().parent
 
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173").rstrip("/")
+
 app = FastAPI(
     title="TripMate AI",
     description=(
@@ -35,10 +38,11 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "http://localhost:4173",
         "http://127.0.0.1:4173",
+        frontend_url,
     ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.mount(
@@ -168,7 +172,7 @@ async def favicon():
 if __name__ == "__main__":
     uvicorn.run(
         "app:app",
-        host="127.0.0.1",
-        port=8000,
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", "8000")),
         reload=True,
     )
